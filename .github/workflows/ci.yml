@@ -1,0 +1,52 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: self-hosted
+
+    concurrency:
+      group: docker-deploy
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build Docker image
+        run: docker build -t my-devops-app:latest .
+
+      - name: Deploy container (replace running instance)
+        run: |
+          # Stop and remove old container if present
+          if [ "$(docker ps -aq -f name=my-devops-app)" ]; then
+            docker stop my-devops-app || true
+            docker rm my-devops-app || true
+          fi
+
+          # Run new container
+          docker run -d \
+            --name my-devops-app \
+            -p 3000:3000 \
+            --restart unless-stopped \
+            my-devops-app:latest
+
+          # Basic smoke test
+          sleep 5
+          curl -f http://localhost:3000 || (docker logs my-devops-app && exit 1)
