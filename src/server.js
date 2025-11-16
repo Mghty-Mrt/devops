@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
 
 app.get('/', (req, res) => {
-  res.send('Hello from Dockerized Express!');
+  res.send('Hello from Guilder!');
 });
 
 app.listen(PORT, HOST, () => {
