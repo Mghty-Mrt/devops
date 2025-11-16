@@ -1,0 +1,12 @@
+{
+  "name": "my-devops-app",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "echo \"(tests optional for now)\" && exit 0"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  }
+}
